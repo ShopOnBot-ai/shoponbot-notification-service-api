@@ -1,0 +1,15 @@
+services:
+  notification_service:
+    build: .
+    container_name: notification_service
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - KAFKA_BOOTSTRAP_SERVERS=kafka_broker:29092
+    networks:
+      - shoponbot_external_shared_net
+
+networks:
+  shoponbot_external_shared_net:
+    external: true
+    name: shoponbot-production-network
