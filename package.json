@@ -5,7 +5,9 @@
   "main": "app/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc -p tsconfig.json" 
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "dev": "node dist/server.js"
   },
   "repository": {
     "type": "git",
@@ -20,12 +22,17 @@
   },
   "homepage": "https://github.com/ShopOnBot-ai/shoponbot-notification-service-api#readme",
   "dependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
     "dotenv": "^18.0.3",
-    "kafkajs": "^2.2.4"
+    "kafkajs": "^2.2.4",
+    "redis": "^6.2.1",
+    "socket.io": "^4.8.4"
   },
   "devDependencies": {
     "@types/node": "^26.6.2",
+    "@types/socket.io": "^3.0.1",
     "ts-node": "^10.9.2",
+    "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   }
 }

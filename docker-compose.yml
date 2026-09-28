@@ -2,10 +2,15 @@ services:
   notification_service:
     build: .
     container_name: notification_service
+    ports:
+      - "8003:8003"
     restart: always
-    environment:
-      - NODE_ENV=production
-      - KAFKA_BOOTSTRAP_SERVERS=kafka_broker:29092
+    env_file:
+      - .env
+    command: npx tsx watch app/app/server.ts
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     networks:
       - shoponbot_external_shared_net
 
