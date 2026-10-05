@@ -1,6 +1,8 @@
 import { Kafka, Consumer } from "kafkajs"
 import { io } from "../core/socket.js";
-
+import axios from "axios"
+const backend_api_url = process.env.BACKEND_API_URL ?? "http://fastapi_app:8000"
+console.log("backend api url", backend_api_url)
 class KafkaConsumerManager {
     private kafka: Kafka;
     private consumer: Consumer | null = null
@@ -59,6 +61,17 @@ class KafkaConsumerManager {
                                     total_amount: eventData.payload.total_amount,
                                     items_count: eventData.payload.items?.length || 0
                                 })
+                            }
+                            const userId = eventData.payload.user_id;
+                            console.log("userId", userId)
+                            if (userId) {
+                                try {
+                                    await axios.delete(`${backend_api_url}/api/v1/cart/internal/${userId}`)
+                                    console.log(`Success: Backend API executed cart database cleanup for user: ${userId}`);
+                                } catch (cartError: any) {
+                                     console.error("Non-blocking error: Server-to-server cart clear hook failed:", cartError.message);
+                                     throw cartError;
+                                }
                             }
                             break;
                         default:
