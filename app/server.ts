@@ -2,6 +2,7 @@ import dotenv from "dotenv"
 import { kafkaConsumerClient } from "./messaging/consumer.js"
 import { createServer } from "http";
 import { socket } from "./core/socket.js";
+import "./core/redis.js"
 
 dotenv.config()
 

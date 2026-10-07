@@ -1,8 +1,9 @@
 import { Kafka, Consumer } from "kafkajs"
-import { io } from "../core/socket.js";
-import axios from "axios"
+import { orderShipmentProcessor } from "../controllers/orderShipmentProcessor.js";
+import { orderPaidProcessor } from "../controllers/orderPaidProcessor.js";
+
 const backend_api_url = process.env.BACKEND_API_URL ?? "http://fastapi_app:8000"
-console.log("backend api url", backend_api_url)
+
 class KafkaConsumerManager {
     private kafka: Kafka;
     private consumer: Consumer | null = null
@@ -51,29 +52,13 @@ class KafkaConsumerManager {
                             break;
                     
                         case "OrderPaid":
-                            console.log(`Payment Successful alert generated for Order #${eventData.payload.order_number}! Shooting email...`);
-                            if (io) {
-                                console.log("if called...")
-                                io.emit('newOrder', {
-                                    event: "OrderPaid",
-                                    order_id: eventData.payload.order_id,
-                                    order_number: eventData.payload.order_number,
-                                    total_amount: eventData.payload.total_amount,
-                                    items_count: eventData.payload.items?.length || 0
-                                })
-                            }
-                            const userId = eventData.payload.user_id;
-                            console.log("userId", userId)
-                            if (userId) {
-                                try {
-                                    await axios.delete(`${backend_api_url}/api/v1/cart/internal/${userId}`)
-                                    console.log(`Success: Backend API executed cart database cleanup for user: ${userId}`);
-                                } catch (cartError: any) {
-                                     console.error("Non-blocking error: Server-to-server cart clear hook failed:", cartError.message);
-                                     throw cartError;
-                                }
-                            }
+                            console.log(`Payment Successful alert generated for Order #${eventData.payload.order_number}! Notifiying in whatsapp...`);
+                            await orderPaidProcessor(eventData, backend_api_url);
                             break;
+                        case "OrderShipped":
+                            await orderShipmentProcessor(eventData)
+                            break;
+
                         default:
                             console.log(`Unhandled custom runtime tracking event type string: ${eventData.event_type}`);
                     }
